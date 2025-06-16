@@ -27,9 +27,17 @@ Value: mailerlite-domain-verification=a32abb8fd4e8ffae9c45fb90fb8a6b617310537c
 TTL: 300 (or default)
 ```
 
+### 3. CNAME Records
+```
+Name: www.repmotivatedseller.org
+Type: CNAME
+Value: pages.mailerlite.com
+TTL: 300 (or default)
+```
+
 ## Additional Recommended Records
 
-### 3. CNAME Record (for www subdomain - Alternative to www A record)
+### 4. CNAME Record (for www subdomain - Alternative to www A record)
 *Note: Use either the www A record OR this CNAME, not both*
 ```
 Name: www
@@ -38,7 +46,7 @@ Value: shoprealestatespace.org
 TTL: 300 (or default)
 ```
 
-### 4. MX Records (if you plan to use email)
+### 5. MX Records (if you plan to use email)
 *Add these if you want to receive email at your domain*
 ```
 Name: @
@@ -48,7 +56,7 @@ Value: mail.shoprealestatespace.org
 TTL: 300 (or default)
 ```
 
-### 5. Additional Security Records (Recommended)
+### 6. Additional Security Records (Recommended)
 
 #### SPF Record (Email Security)
 ```
@@ -65,6 +73,15 @@ Type: TXT
 Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@shoprealestatespace.org
 TTL: 300 (or default)
 ```
+
+## MailerLite Integration
+
+The CNAME record for `www.repmotivatedseller.org` pointing to `pages.mailerlite.com` will allow you to:
+- Host MailerLite landing pages on your subdomain
+- Create branded email signup forms
+- Use custom URLs for your email marketing campaigns
+
+**Important**: Make sure you also configure this subdomain in your MailerLite account settings to complete the integration.
 
 ## Step-by-Step NS1 Setup Process
 
@@ -96,6 +113,11 @@ dig www.shoprealestatespace.org A
 dig shoprealestatespace.org TXT
 ```
 
+#### Check CNAME Record:
+```bash
+dig www.repmotivatedseller.org CNAME
+```
+
 #### Online Tools:
 - Use DNS checker tools like whatsmydns.net
 - Enter your domain and check different record types
@@ -118,11 +140,15 @@ dig shoprealestatespace.org TXT
    - http://shoprealestatespace.org
    - http://www.shoprealestatespace.org
 
-2. **MailerLite Verification**: 
+2. **MailerLite Integration**: Test:
+   - http://www.repmotivatedseller.org (should redirect to MailerLite)
+   - Verify in MailerLite dashboard that custom domain is working
+
+3. **MailerLite Verification**: 
    - The TXT record will allow MailerLite to verify domain ownership
    - Check your MailerLite dashboard for verification status
 
-3. **SSL Certificate**:
+4. **SSL Certificate**:
    - If using HTTPS, you may need to configure SSL certificates
    - Many hosting providers offer free Let's Encrypt certificates
 
@@ -132,6 +158,7 @@ dig shoprealestatespace.org TXT
 1. **Records not resolving**: Check TTL and wait for propagation
 2. **Website not loading**: Verify A record points to correct IP
 3. **Email verification failing**: Ensure TXT record is exactly as specified
+4. **CNAME not working**: Ensure there are no conflicting A records for the same subdomain
 
 ### DNS Propagation Checkers:
 - whatsmydns.net
@@ -143,8 +170,9 @@ dig shoprealestatespace.org TXT
 1. **Verify all records are resolving correctly**
 2. **Test website accessibility**
 3. **Complete MailerLite domain verification**
-4. **Set up SSL certificate if needed**
-5. **Configure any additional services (email, subdomains, etc.)**
+4. **Configure MailerLite custom domain settings**
+5. **Set up SSL certificate if needed**
+6. **Configure any additional services (email, subdomains, etc.)**
 
 ## Contact Information
 If you encounter issues:

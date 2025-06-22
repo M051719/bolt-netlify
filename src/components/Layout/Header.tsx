@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Building2, Menu, X, User, LogOut, Settings, CreditCard } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -23,32 +25,58 @@ export const Header: React.FC = () => {
     }
   };
 
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <Building2 className="w-8 h-8 text-blue-600" />
             <span className="ml-2 text-xl font-bold text-gray-900">
               RepMotivatedSeller
             </span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link 
+              to="/" 
+              className={`transition-colors ${
+                isActive('/') 
+                  ? 'text-blue-600 font-medium' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`}
+            >
               Dashboard
-            </a>
+            </Link>
+            <Link 
+              to="/foreclosure" 
+              className={`transition-colors ${
+                isActive('/foreclosure') 
+                  ? 'text-blue-600 font-medium' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`}
+            >
+              Foreclosure Help
+            </Link>
             <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">
               Analysis Tools
             </a>
             <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">
               Resources
             </a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link 
+              to="/pricing" 
+              className={`transition-colors ${
+                isActive('/pricing') 
+                  ? 'text-blue-600 font-medium' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`}
+            >
               Pricing
-            </a>
+            </Link>
           </nav>
 
           {/* User Menu */}
@@ -112,12 +140,18 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <button className="text-gray-700 hover:text-blue-600 transition-colors">
+                <Link 
+                  to="/auth" 
+                  className="text-gray-700 hover:text-blue-600 transition-colors"
+                >
                   Sign In
-                </button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                </Link>
+                <Link 
+                  to="/auth" 
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Get Started
-                </button>
+                </Link>
               </div>
             )}
 
@@ -139,18 +173,45 @@ export const Header: React.FC = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <nav className="space-y-2">
-              <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+              <Link 
+                to="/" 
+                className={`block px-4 py-2 rounded-lg ${
+                  isActive('/') 
+                    ? 'bg-blue-50 text-blue-600 font-medium' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Dashboard
-              </a>
+              </Link>
+              <Link 
+                to="/foreclosure" 
+                className={`block px-4 py-2 rounded-lg ${
+                  isActive('/foreclosure') 
+                    ? 'bg-blue-50 text-blue-600 font-medium' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Foreclosure Help
+              </Link>
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
                 Analysis Tools
               </a>
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
                 Resources
               </a>
-              <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+              <Link 
+                to="/pricing" 
+                className={`block px-4 py-2 rounded-lg ${
+                  isActive('/pricing') 
+                    ? 'bg-blue-50 text-blue-600 font-medium' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Pricing
-              </a>
+              </Link>
             </nav>
           </div>
         )}

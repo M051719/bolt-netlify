@@ -5,6 +5,7 @@ import stripePromise from './lib/stripe';
 import { Header } from './components/Layout/Header';
 import { PricingPage } from './pages/PricingPage';
 import { AuthPage } from './pages/AuthPage';
+import { ForeclosurePage } from './pages/ForeclosurePage';
 import { useAuthStore } from './store/authStore';
 
 const Dashboard: React.FC = () => {
@@ -72,6 +73,7 @@ function App() {
               element={!isAuthenticated ? <AuthPage /> : <Navigate to="/" />} 
             />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/foreclosure" element={<ForeclosurePage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

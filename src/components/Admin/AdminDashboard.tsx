@@ -18,11 +18,15 @@ import {
   Send,
   Settings,
   Bell,
-  BarChart3
+  BarChart3,
+  Shield,
+  Zap
 } from 'lucide-react';
 import { supabase, ForeclosureResponse } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { NotificationSettings } from './NotificationSettings';
+import { ProjectVerification } from './ProjectVerification';
+import { OwnershipVerification } from './OwnershipVerification';
 
 interface AdminStats {
   total: number;
@@ -43,7 +47,7 @@ export const AdminDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'verification' | 'ownership'>('dashboard');
   const [stats, setStats] = useState<AdminStats>({
     total: 0,
     submitted: 0,
@@ -57,8 +61,10 @@ export const AdminDashboard: React.FC = () => {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    fetchSubmissions();
-  }, []);
+    if (activeTab === 'dashboard') {
+      fetchSubmissions();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     filterSubmissions();
@@ -318,7 +324,7 @@ export const AdminDashboard: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  if (isLoading) {
+  if (isLoading && activeTab === 'dashboard') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -358,14 +364,39 @@ export const AdminDashboard: React.FC = () => {
               }`}
             >
               <Settings className="w-4 h-4 inline mr-2" />
-              Notification Settings
+              Notifications
+            </button>
+            <button
+              onClick={() => setActiveTab('verification')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'verification'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Zap className="w-4 h-4 inline mr-2" />
+              System Check
+            </button>
+            <button
+              onClick={() => setActiveTab('ownership')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'ownership'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Shield className="w-4 h-4 inline mr-2" />
+              Ownership
             </button>
           </div>
         </div>
 
-        {activeTab === 'settings' ? (
-          <NotificationSettings />
-        ) : (
+        {/* Tab Content */}
+        {activeTab === 'settings' && <NotificationSettings />}
+        {activeTab === 'verification' && <ProjectVerification />}
+        {activeTab === 'ownership' && <OwnershipVerification />}
+        
+        {activeTab === 'dashboard' && (
           <>
             {/* Enhanced Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">

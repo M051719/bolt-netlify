@@ -1272,7 +1272,7 @@ function generateCashoutRefiDocument(data: CashoutRefiFormData): string {
                 <tr><th>New Loan Details</th><th>Amount/Terms</th></tr>
                 <tr><td><strong>Requested Loan Amount</strong></td><td><strong>$${requestedLoan.toLocaleString()}</strong></td></tr>
                 <tr><td>Cash-Out Amount</td><td>$${cashOut.toLocaleString()}</td></tr>
-                <tr><td>Loan Term</td><td>${data.newL oanTerm} months</td></tr>
+                <tr><td>Loan Term</td><td>${data.newLoanTerm} months</td></tr>
                 <tr><td>Desired Interest Rate</td><td>${data.desiredRate || 'Market Rate'}%</td></tr>
                 <tr><td>Loan Program</td><td>${data.loanProgram}</td></tr>
                 <tr><td><strong>Loan-to-Value Ratio</strong></td><td><strong>${ltv}%</strong></td></tr>

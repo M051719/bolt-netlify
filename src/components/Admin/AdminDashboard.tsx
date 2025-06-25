@@ -20,13 +20,15 @@ import {
   Bell,
   BarChart3,
   Shield,
-  Zap
+  Zap,
+  Globe
 } from 'lucide-react';
 import { supabase, ForeclosureResponse } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { NotificationSettings } from './NotificationSettings';
 import { ProjectVerification } from './ProjectVerification';
 import { OwnershipVerification } from './OwnershipVerification';
+import { DNSVerification } from './DNSVerification';
 
 interface AdminStats {
   total: number;
@@ -47,7 +49,7 @@ export const AdminDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'verification' | 'ownership'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'verification' | 'ownership' | 'dns'>('dashboard');
   const [stats, setStats] = useState<AdminStats>({
     total: 0,
     submitted: 0,
@@ -378,6 +380,17 @@ export const AdminDashboard: React.FC = () => {
               System Check
             </button>
             <button
+              onClick={() => setActiveTab('dns')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'dns'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Globe className="w-4 h-4 inline mr-2" />
+              DNS & Domain
+            </button>
+            <button
               onClick={() => setActiveTab('ownership')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === 'ownership'
@@ -394,6 +407,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Tab Content */}
         {activeTab === 'settings' && <NotificationSettings />}
         {activeTab === 'verification' && <ProjectVerification />}
+        {activeTab === 'dns' && <DNSVerification />}
         {activeTab === 'ownership' && <OwnershipVerification />}
         
         {activeTab === 'dashboard' && (

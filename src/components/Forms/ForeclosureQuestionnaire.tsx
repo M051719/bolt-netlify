@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Home, AlertTriangle, FileText, CheckCircle, Calendar, DollarSign, Phone, Mail, User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 
 interface FormData {
   // Contact Information
@@ -114,21 +115,35 @@ export const ForeclosureQuestionnaire: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-foreclosure-form`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit questionnaire');
+      // Get the current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('No active session found');
       }
 
+      // Prepare the data for submission
+      const submissionData = {
+        ...formData,
+        missed_payments: formData.missed_payments ? parseInt(formData.missed_payments) : 0,
+        payment_difficulty_date: formData.payment_difficulty_date || null,
+      };
+
+      // Submit to Supabase
+      const { data, error } = await supabase
+        .from('foreclosure_responses')
+        .insert([{
+          user_id: session.user.id,
+          ...submissionData,
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Form submitted successfully:', data);
       setIsSubmitted(true);
     } catch (error) {
       console.error('Error submitting form:', error);

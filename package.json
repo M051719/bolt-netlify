@@ -20,7 +20,8 @@
     "@stripe/stripe-js": "^2.4.0",
     "@stripe/react-stripe-js": "^2.4.0",
     "zustand": "^4.5.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

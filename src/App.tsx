@@ -6,6 +6,7 @@ import { Header } from './components/Layout/Header';
 import { PricingPage } from './pages/PricingPage';
 import { AuthPage } from './pages/AuthPage';
 import { ForeclosurePage } from './pages/ForeclosurePage';
+import { AdminPage } from './pages/AdminPage';
 import { useAuthStore } from './store/authStore';
 
 const Dashboard: React.FC = () => {
@@ -74,6 +75,7 @@ function App() {
             />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/foreclosure" element={<ForeclosurePage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

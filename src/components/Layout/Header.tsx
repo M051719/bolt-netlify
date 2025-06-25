@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Menu, X, User, LogOut, Settings, CreditCard } from 'lucide-react';
+import { Building2, Menu, X, User, LogOut, Settings, CreditCard, Shield } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 
@@ -26,6 +26,10 @@ export const Header: React.FC = () => {
   };
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Check if user is admin
+  const isAdmin = user?.email === 'admin@repmotivatedseller.org' || 
+                  user?.name?.toLowerCase().includes('admin');
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -77,6 +81,18 @@ export const Header: React.FC = () => {
             >
               Pricing
             </Link>
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className={`transition-colors ${
+                  isActive('/admin') 
+                    ? 'text-blue-600 font-medium' 
+                    : 'text-gray-700 hover:text-blue-600'
+                }`}
+              >
+                Admin
+              </Link>
+            )}
           </nav>
 
           {/* User Menu */}
@@ -96,6 +112,11 @@ export const Header: React.FC = () => {
                       <span className={`px-2 py-0.5 text-xs rounded-full ${getMembershipBadgeColor(user.membershipTier)}`}>
                         {user.membershipTier}
                       </span>
+                      {isAdmin && (
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800">
+                          Admin
+                        </span>
+                      )}
                     </div>
                   </div>
                 </button>
@@ -128,6 +149,16 @@ export const Header: React.FC = () => {
                       <Settings className="w-4 h-4 mr-3" />
                       Settings
                     </a>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Shield className="w-4 h-4 mr-3" />
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -212,6 +243,19 @@ export const Header: React.FC = () => {
               >
                 Pricing
               </Link>
+              {isAdmin && (
+                <Link 
+                  to="/admin" 
+                  className={`block px-4 py-2 rounded-lg ${
+                    isActive('/admin') 
+                      ? 'bg-blue-50 text-blue-600 font-medium' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
             </nav>
           </div>
         )}

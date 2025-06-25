@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { Home, AlertTriangle, FileText, CheckCircle, Calendar, DollarSign, Phone, Mail } from 'lucide-react';
+import { Home, AlertTriangle, FileText, CheckCircle, Calendar, DollarSign, Phone, Mail, User } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 
 interface FormData {
+  // Contact Information
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  
   // Situation Questions
   situation_length: string;
   payment_difficulty_date: string;
@@ -41,6 +47,9 @@ interface FormData {
 }
 
 const initialFormData: FormData = {
+  contact_name: '',
+  contact_email: '',
+  contact_phone: '',
   situation_length: '',
   payment_difficulty_date: '',
   lender: '',
@@ -77,8 +86,11 @@ export const ForeclosureQuestionnaire: React.FC = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { user, isAuthenticated } = useAuthStore();
 
   const sections = [
+    { title: 'Contact Information', icon: User, color: 'purple' },
     { title: 'Situation Assessment', icon: Home, color: 'blue' },
     { title: 'Problem Identification', icon: AlertTriangle, color: 'orange' },
     { title: 'Impact Analysis', icon: FileText, color: 'red' },
@@ -92,13 +104,38 @@ export const ForeclosureQuestionnaire: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    
+    if (!isAuthenticated) {
+      setSubmitError('Please sign in to submit the questionnaire');
+      return;
+    }
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-foreclosure-form`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit questionnaire');
+      }
+
       setIsSubmitted(true);
-    }, 2000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextSection = () => {
@@ -115,6 +152,7 @@ export const ForeclosureQuestionnaire: React.FC = () => {
 
   const getSectionColor = (color: string) => {
     const colors = {
+      purple: 'bg-purple-500',
       blue: 'bg-blue-500',
       orange: 'bg-orange-500',
       red: 'bg-red-500',
@@ -122,6 +160,17 @@ export const ForeclosureQuestionnaire: React.FC = () => {
     };
     return colors[color as keyof typeof colors];
   };
+
+  // Pre-fill contact info from user data
+  React.useEffect(() => {
+    if (user && !formData.contact_name && !formData.contact_email) {
+      setFormData(prev => ({
+        ...prev,
+        contact_name: user.name || '',
+        contact_email: user.email || '',
+      }));
+    }
+  }, [user, formData.contact_name, formData.contact_email]);
 
   if (isSubmitted) {
     return (
@@ -144,6 +193,28 @@ export const ForeclosureQuestionnaire: React.FC = () => {
               help@repmotivatedseller.org
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <User className="w-8 h-8 text-blue-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Sign In Required</h2>
+          <p className="text-gray-600 mb-6">
+            Please sign in to access the foreclosure questionnaire. This helps us provide personalized assistance and keep your information secure.
+          </p>
+          <a
+            href="/auth"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          >
+            Sign In
+          </a>
         </div>
       </div>
     );
@@ -185,7 +256,7 @@ export const ForeclosureQuestionnaire: React.FC = () => {
                   </div>
                   {index < sections.length - 1 && (
                     <div
-                      className={`h-1 w-16 mx-2 transition-all duration-300 ${
+                      className={`h-1 w-12 mx-2 transition-all duration-300 ${
                         isCompleted ? 'bg-green-500' : 'bg-gray-200'
                       }`}
                     />
@@ -206,8 +277,74 @@ export const ForeclosureQuestionnaire: React.FC = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Section 1: Situation Questions */}
+          {/* Section 0: Contact Information */}
           {currentSection === 0 && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      name="contact_name"
+                      value={formData.contact_name}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="email"
+                      name="contact_email"
+                      value={formData.contact_email}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="tel"
+                      name="contact_phone"
+                      value={formData.contact_phone}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-sm text-purple-800">
+                  <strong>Privacy Notice:</strong> Your information is kept strictly confidential and will only be used to provide you with personalized foreclosure assistance options.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Section 1: Situation Questions */}
+          {currentSection === 1 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -445,7 +582,7 @@ export const ForeclosureQuestionnaire: React.FC = () => {
           )}
 
           {/* Section 2: Problem Questions */}
-          {currentSection === 1 && (
+          {currentSection === 2 && (
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -600,7 +737,7 @@ export const ForeclosureQuestionnaire: React.FC = () => {
           )}
 
           {/* Section 3: Implication Questions */}
-          {currentSection === 2 && (
+          {currentSection === 3 && (
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -705,7 +842,7 @@ export const ForeclosureQuestionnaire: React.FC = () => {
           )}
 
           {/* Section 4: Need-Payoff Questions */}
-          {currentSection === 3 && (
+          {currentSection === 4 && (
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -859,6 +996,13 @@ export const ForeclosureQuestionnaire: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Error Display */}
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800 text-sm">{submitError}</p>
             </div>
           )}
 

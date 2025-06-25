@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Home, DollarSign, Wrench, TrendingUp, Building2 } from 'lucide-react';
+import { FileText, Home, DollarSign, Wrench, TrendingUp, Building2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { WholesaleContractForm } from '../components/Contracts/WholesaleContractForm';
 import { FixFlipContractForm } from '../components/Contracts/FixFlipContractForm';
 import { CashoutRefiForm } from '../components/Contracts/CashoutRefiForm';
@@ -110,6 +110,57 @@ export const ContractsPage: React.FC = () => {
           </p>
         </div>
 
+        {/* Financing Notice */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl p-8 mb-12">
+          <div className="text-center">
+            <DollarSign className="w-12 h-12 text-yellow-300 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-4">
+              🏦 All Deals Financed Through RepMotivatedSeller
+            </h2>
+            <p className="text-lg mb-6 text-blue-100">
+              Private Money Opportunity: Investment Property Loans Available
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white/10 rounded-lg p-4">
+                <div className="font-semibold mb-2">Loan Amount</div>
+                <div className="text-yellow-200">$30,000 to FHA Cap</div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4">
+                <div className="font-semibold mb-2">Interest Rate</div>
+                <div className="text-yellow-200">8% - 15%</div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4">
+                <div className="font-semibold mb-2">Term</div>
+                <div className="text-yellow-200">6 - 24 Months</div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-4">
+                <div className="font-semibold mb-2">LTV</div>
+                <div className="text-yellow-200">Up to 90% Purchase</div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <AlertTriangle className="w-5 h-5 text-yellow-300 mr-3 mt-0.5" />
+                <div className="text-left">
+                  <div className="font-semibold text-yellow-100 mb-2">Important Requirements</div>
+                  <ul className="text-sm text-yellow-200 space-y-1">
+                    <li>• <strong>Non-Owner Occupied Investment Properties Only</strong></li>
+                    <li>• <strong>Must be made through a borrower entity</strong></li>
+                    <li>• Available in 36 states (excludes MN, NV, SD, UT, VT)</li>
+                    <li>• Broker fees paid subject to final underwriting and compliance</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+              Apply for Private Money Financing
+            </button>
+          </div>
+        </div>
+
         {/* Contract Type Selection */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {contractTypes.map((contract) => {
@@ -151,6 +202,73 @@ export const ContractsPage: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Property Requirements */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
+            1-4 Unit Property Requirements
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <Home className="w-6 h-6 text-blue-600 mr-2" />
+                Property Specifications
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium">Property Type:</span>
+                  <span className="text-gray-700">Non-Owner Occupied SFR (1-4 Units)</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium">Price Limit:</span>
+                  <span className="text-gray-700">Not to exceed FHA cap for area</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium">Lot Size:</span>
+                  <span className="text-gray-700">1/2 acre maximum</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium">Bedrooms/Bathrooms:</span>
+                  <span className="text-gray-700">5 bedroom / 3 bathroom maximum</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium">Square Footage:</span>
+                  <span className="text-gray-700">2,800 sq ft maximum</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <DollarSign className="w-6 h-6 text-green-600 mr-2" />
+                Loan Parameters
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span className="font-medium">Purchase:</span>
+                  <span className="text-green-700 font-semibold">90% LTV</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <span className="font-medium">Rehab:</span>
+                  <span className="text-blue-700 font-semibold">70% (not to exceed 65% LTV)</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <span className="font-medium">Cash-out Refinance:</span>
+                  <span className="text-purple-700 font-semibold">50% LTV</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                  <span className="font-medium">Investment Purpose:</span>
+                  <span className="text-orange-700">Acquisition, Cash-Out, Refinance, Rehab</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium">Appraiser Level:</span>
+                  <span className="text-gray-700">General Appraiser Required</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Features Overview */}

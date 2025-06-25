@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Bell, 
-  Mail, 
-  MessageSquare, 
-  Phone, 
-  Settings, 
-  Save, 
-  Test,
-  CheckCircle,
-  AlertCircle,
-  Clock,
-  Users
-} from 'lucide-react';
+import { Bell, Mail, MessageSquare, Phone, Settings, Save, TestTube as Test, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react';
 
 interface NotificationSettings {
   emailNotifications: {

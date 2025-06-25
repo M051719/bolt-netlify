@@ -1,6 +1,6 @@
 import React from 'react';
 import { ForeclosureQuestionnaire } from '../components/Forms/ForeclosureQuestionnaire';
-import { DollarSign, AlertTriangle, CheckCircle, Home } from 'lucide-react';
+import { DollarSign, AlertTriangle, CheckCircle, Home, Building } from 'lucide-react';
 
 export const ForeclosurePage: React.FC = () => {
   return (
@@ -14,10 +14,10 @@ export const ForeclosurePage: React.FC = () => {
               🏦 Financing Solutions Available Through RepMotivatedSeller
             </h2>
             <p className="text-blue-100 mb-4">
-              Private money loans for investment properties • Non-owner occupied only • Borrower entity required
+              Private money loans for residential & multifamily investment properties • Non-owner occupied only • Borrower entity required
             </p>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-5xl mx-auto">
               <div className="bg-white/10 rounded-lg p-3">
                 <div className="font-semibold text-sm">Loan Amount</div>
                 <div className="text-yellow-200 text-sm">$30K - FHA Cap</div>
@@ -31,16 +31,20 @@ export const ForeclosurePage: React.FC = () => {
                 <div className="text-yellow-200 text-sm">6-24 Months</div>
               </div>
               <div className="bg-white/10 rounded-lg p-3">
-                <div className="font-semibold text-sm">Purpose</div>
-                <div className="text-yellow-200 text-sm">Investment Only</div>
+                <div className="font-semibold text-sm">Residential</div>
+                <div className="text-yellow-200 text-sm">1-4 Units</div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <div className="font-semibold text-sm">Multifamily</div>
+                <div className="text-yellow-200 text-sm">5+ Units</div>
               </div>
             </div>
 
-            <div className="mt-4 bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-3 max-w-4xl mx-auto">
+            <div className="mt-4 bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-3 max-w-5xl mx-auto">
               <div className="flex items-center justify-center">
                 <AlertTriangle className="w-4 h-4 text-yellow-300 mr-2" />
                 <span className="text-sm text-yellow-200">
-                  Available in 36 states • Excludes: MN, NV, SD, UT, VT • Broker fees subject to underwriting
+                  Available in 36 states • Excludes: MN, NV, SD, UT, VT • Residential & commercial loans available • Broker fees subject to underwriting
                 </span>
               </div>
             </div>

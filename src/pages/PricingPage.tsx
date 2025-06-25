@@ -3,7 +3,7 @@ import { membershipPlans } from '../types/membership';
 import { PricingCard } from '../components/Membership/PricingCard';
 import { SubscriptionManager } from '../components/Membership/SubscriptionManager';
 import { useAuthStore } from '../store/authStore';
-import { DollarSign, AlertTriangle, Home, MapPin } from 'lucide-react';
+import { DollarSign, AlertTriangle, Home, MapPin, Building } from 'lucide-react';
 
 export const PricingPage: React.FC = () => {
   const { user, isAuthenticated } = useAuthStore();
@@ -38,7 +38,7 @@ export const PricingPage: React.FC = () => {
               🏦 All Deals Financed Through RepMotivatedSeller
             </h2>
             <p className="text-xl mb-6 text-blue-100">
-              Private Money Opportunity for Investment Properties
+              Private Money Opportunity: Residential & Multifamily Investment Properties
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -64,31 +64,34 @@ export const PricingPage: React.FC = () => {
               <div className="bg-white/10 rounded-lg p-6">
                 <div className="font-semibold text-lg mb-2 flex items-center">
                   <Home className="w-5 h-5 mr-2" />
-                  Property Requirements
+                  Residential Properties (1-4 Units)
                 </div>
                 <ul className="text-blue-100 text-sm space-y-1 text-left">
-                  <li>• Non-Owner Occupied Investment Only</li>
-                  <li>• 1-4 Unit Properties</li>
+                  <li>• Single Family Residences</li>
+                  <li>• Duplexes, Triplexes, Fourplexes</li>
                   <li>• Price ≤ FHA cap for area</li>
-                  <li>• Max 1/2 acre, 5BR/3BA, 2,800 sq ft</li>
+                  <li>• Max 1/2 acre, 5BR/3BA per unit, 2,800 sq ft per unit</li>
+                </ul>
+              </div>
+              <div className="bg-white/10 rounded-lg p-6">
+                <div className="font-semibold text-lg mb-2 flex items-center">
+                  <Building className="w-5 h-5 mr-2" />
+                  Multifamily & Commercial
+                </div>
+                <ul className="text-blue-100 text-sm space-y-1 text-left">
+                  <li>• Apartment buildings (5+ units)</li>
+                  <li>• Multifamily dwelling complexes</li>
+                  <li>• Mixed-use residential/commercial</li>
+                  <li>• Student housing & senior living</li>
                 </ul>
               </div>
               <div className="bg-white/10 rounded-lg p-6">
                 <div className="font-semibold text-lg mb-2">Loan Parameters</div>
                 <ul className="text-blue-100 text-sm space-y-1 text-left">
-                  <li>• 90% Purchase</li>
+                  <li>• 90% Purchase (1-4 units)</li>
+                  <li>• 80% Purchase (5+ units)</li>
                   <li>• 70% Rehab (≤65% LTV)</li>
                   <li>• 50% Cash-out Refinance LTV</li>
-                  <li>• General Appraiser Required</li>
-                </ul>
-              </div>
-              <div className="bg-white/10 rounded-lg p-6">
-                <div className="font-semibold text-lg mb-2">Investment Purpose</div>
-                <ul className="text-blue-100 text-sm space-y-1 text-left">
-                  <li>• Acquisition</li>
-                  <li>• Cash-Out Refinance</li>
-                  <li>• Rehab Projects</li>
-                  <li>• Investment Properties</li>
                 </ul>
               </div>
             </div>
@@ -101,6 +104,7 @@ export const PricingPage: React.FC = () => {
                   <ul className="text-sm text-yellow-200 space-y-1">
                     <li>• <strong>Non-Owner Occupied Investment Properties Only</strong></li>
                     <li>• <strong>Must be made through a borrower entity</strong></li>
+                    <li>• <strong>Residential and Commercial Loans Available</strong></li>
                     <li>• No minimum credit score (680+ and 20%+ down strengthen applications)</li>
                     <li>• Broker fees paid subject to final underwriting and compliance with applicable law</li>
                   </ul>
@@ -181,7 +185,16 @@ export const PricingPage: React.FC = () => {
                 What about financing for my deals?
               </h3>
               <p className="text-gray-600">
-                All deals can be financed through RepMotivatedSeller's private money program. We offer investment property loans from $30,000 to FHA caps with competitive rates and flexible terms for qualified borrowers.
+                All deals can be financed through RepMotivatedSeller's private money program. We offer residential and multifamily investment property loans from $30,000 to FHA caps with competitive rates and flexible terms for qualified borrowers.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Do you finance apartment buildings and multifamily properties?
+              </h3>
+              <p className="text-gray-600">
+                Yes! We provide financing for both residential properties (1-4 units) and commercial multifamily properties including apartment buildings, multifamily dwelling complexes, student housing, and senior living facilities.
               </p>
             </div>
 

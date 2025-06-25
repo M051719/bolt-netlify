@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DollarSign, X, MapPin, Home, Calendar, Percent, AlertTriangle, CheckCircle } from 'lucide-react';
+import { DollarSign, X, MapPin, Home, Calendar, Percent, AlertTriangle, CheckCircle, Building } from 'lucide-react';
 
 export const FinancingBanner: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -30,7 +30,7 @@ export const FinancingBanner: React.FC = () => {
                   🏦 Private Money Financing Available Through RepMotivatedSeller
                 </p>
                 <p className="text-sm text-blue-100">
-                  Investment property loans • 8-15% rates • $30K-FHA cap • 6-24 months
+                  Residential & multifamily investment loans • 8-15% rates • $30K-FHA cap • 6-24 months
                 </p>
               </div>
             </div>
@@ -86,24 +86,37 @@ export const FinancingBanner: React.FC = () => {
                 {/* Property Requirements */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-2" />
+                    <Building className="w-5 h-5 mr-2" />
                     Property Requirements
                   </h3>
                   <div className="space-y-3 text-sm">
                     <div className="bg-white/10 p-3 rounded">
-                      <div className="font-medium mb-2">1-4 Unit Properties</div>
+                      <div className="font-medium mb-2">Residential Properties (1-4 Units)</div>
                       <ul className="space-y-1 text-blue-100">
-                        <li>• Single Family Residences (1-4 Units)</li>
+                        <li>• Single Family Residences</li>
+                        <li>• Duplexes, Triplexes, Fourplexes</li>
                         <li>• Price not to exceed FHA cap for area</li>
                         <li>• Maximum 1/2 acre lot size</li>
-                        <li>• Maximum 5 bedrooms, 3 bathrooms</li>
-                        <li>• Maximum 2,800 square feet</li>
+                        <li>• Maximum 5 bedrooms, 3 bathrooms per unit</li>
+                        <li>• Maximum 2,800 square feet per unit</li>
+                      </ul>
+                    </div>
+                    <div className="bg-white/10 p-3 rounded">
+                      <div className="font-medium mb-2">Multifamily & Commercial</div>
+                      <ul className="space-y-1 text-blue-100">
+                        <li>• Apartment buildings (5+ units)</li>
+                        <li>• Multifamily dwelling complexes</li>
+                        <li>• Mixed-use residential/commercial</li>
+                        <li>• Student housing properties</li>
+                        <li>• Senior living facilities</li>
+                        <li>• Custom loan terms available</li>
                       </ul>
                     </div>
                     <div className="bg-white/10 p-3 rounded">
                       <div className="font-medium mb-2">Loan Parameters</div>
                       <ul className="space-y-1 text-blue-100">
-                        <li>• 90% Purchase</li>
+                        <li>• 90% Purchase (Residential 1-4 units)</li>
+                        <li>• 80% Purchase (Multifamily 5+ units)</li>
                         <li>• 70% Rehab (not to exceed 65% LTV)</li>
                         <li>• 50% Cash-out Refinance LTV</li>
                       </ul>
@@ -115,7 +128,7 @@ export const FinancingBanner: React.FC = () => {
                 <div className="lg:col-span-2">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <MapPin className="w-5 h-5 mr-2" />
-                    Available States
+                    Available States (36 States)
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 text-sm">
                     {availableStates.map((state) => (
@@ -145,6 +158,7 @@ export const FinancingBanner: React.FC = () => {
                   <ul className="text-sm text-yellow-200 space-y-1">
                     <li>• <strong>Investment Purpose Only:</strong> Acquisition, Cash-Out, Refinance, Rehab</li>
                     <li>• <strong>Borrower Entity Required:</strong> Must be made through a borrower entity</li>
+                    <li>• <strong>Residential & Commercial Loans Available:</strong> 1-4 unit residential and multifamily properties</li>
                     <li>• <strong>No Minimum Credit Score:</strong> However, 680+ credit and 20%+ down payment strengthen applications</li>
                     <li>• <strong>General Appraiser Required:</strong> Professional appraisal mandatory</li>
                     <li>• <strong>Broker Fees:</strong> Paid subject to final underwriting and compliance with applicable law</li>

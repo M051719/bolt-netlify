@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Home, DollarSign, Wrench, TrendingUp, Building2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { FileText, Home, DollarSign, Wrench, TrendingUp, Building2, AlertTriangle, CheckCircle, Building } from 'lucide-react';
 import { WholesaleContractForm } from '../components/Contracts/WholesaleContractForm';
 import { FixFlipContractForm } from '../components/Contracts/FixFlipContractForm';
 import { CashoutRefiForm } from '../components/Contracts/CashoutRefiForm';
@@ -118,7 +118,7 @@ export const ContractsPage: React.FC = () => {
               🏦 All Deals Financed Through RepMotivatedSeller
             </h2>
             <p className="text-lg mb-6 text-blue-100">
-              Private Money Opportunity: Investment Property Loans Available
+              Private Money Opportunity: Residential & Multifamily Investment Property Loans Available
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -148,6 +148,7 @@ export const ContractsPage: React.FC = () => {
                   <ul className="text-sm text-yellow-200 space-y-1">
                     <li>• <strong>Non-Owner Occupied Investment Properties Only</strong></li>
                     <li>• <strong>Must be made through a borrower entity</strong></li>
+                    <li>• <strong>Residential and Commercial Loans Available</strong></li>
                     <li>• Available in 36 states (excludes MN, NV, SD, UT, VT)</li>
                     <li>• Broker fees paid subject to final underwriting and compliance</li>
                   </ul>
@@ -207,14 +208,14 @@ export const ContractsPage: React.FC = () => {
         {/* Property Requirements */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-            1-4 Unit Property Requirements
+            Property Requirements & Loan Parameters
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <Home className="w-6 h-6 text-blue-600 mr-2" />
-                Property Specifications
+                Residential Properties (1-4 Units)
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -231,41 +232,76 @@ export const ContractsPage: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span className="font-medium">Bedrooms/Bathrooms:</span>
-                  <span className="text-gray-700">5 bedroom / 3 bathroom maximum</span>
+                  <span className="text-gray-700">5 bedroom / 3 bathroom maximum per unit</span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span className="font-medium">Square Footage:</span>
-                  <span className="text-gray-700">2,800 sq ft maximum</span>
+                  <span className="text-gray-700">2,800 sq ft maximum per unit</span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <DollarSign className="w-6 h-6 text-green-600 mr-2" />
-                Loan Parameters
+                <Building className="w-6 h-6 text-purple-600 mr-2" />
+                Multifamily & Commercial Properties
               </h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <span className="font-medium">Purchase:</span>
-                  <span className="text-green-700 font-semibold">90% LTV</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <span className="font-medium">Rehab:</span>
-                  <span className="text-blue-700 font-semibold">70% (not to exceed 65% LTV)</span>
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <span className="font-medium">Apartment Buildings:</span>
+                  <span className="text-purple-700">5+ units, custom terms</span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                  <span className="font-medium">Cash-out Refinance:</span>
-                  <span className="text-purple-700 font-semibold">50% LTV</span>
+                  <span className="font-medium">Multifamily Complexes:</span>
+                  <span className="text-purple-700">Dwelling complexes, custom LTV</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                  <span className="font-medium">Investment Purpose:</span>
-                  <span className="text-orange-700">Acquisition, Cash-Out, Refinance, Rehab</span>
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <span className="font-medium">Mixed-Use:</span>
+                  <span className="text-purple-700">Residential/commercial combination</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="font-medium">Appraiser Level:</span>
-                  <span className="text-gray-700">General Appraiser Required</span>
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <span className="font-medium">Student Housing:</span>
+                  <span className="text-purple-700">University area properties</span>
                 </div>
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <span className="font-medium">Senior Living:</span>
+                  <span className="text-purple-700">Assisted living facilities</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <DollarSign className="w-6 h-6 text-green-600 mr-2" />
+              Loan Parameters by Property Type
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <span className="font-medium">Purchase (1-4 units):</span>
+                <span className="text-green-700 font-semibold">90% LTV</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <span className="font-medium">Purchase (5+ units):</span>
+                <span className="text-blue-700 font-semibold">80% LTV</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                <span className="font-medium">Rehab:</span>
+                <span className="text-orange-700 font-semibold">70% (≤65% LTV)</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                <span className="font-medium">Cash-out Refinance:</span>
+                <span className="text-purple-700 font-semibold">50% LTV</span>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Investment Purpose:</span>
+                <span className="text-gray-700">Acquisition, Cash-Out, Refinance, Rehab</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Appraiser Level:</span>
+                <span className="text-gray-700">General Appraiser Required</span>
               </div>
             </div>
           </div>
@@ -300,11 +336,11 @@ export const ContractsPage: React.FC = () => {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="w-6 h-6 text-purple-600" />
+                <Building className="w-6 h-6 text-purple-600" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Property Specific</h3>
               <p className="text-gray-600 text-sm">
-                Tailored clauses for different property types and investment strategies
+                Tailored clauses for residential, multifamily, and commercial properties
               </p>
             </div>
 

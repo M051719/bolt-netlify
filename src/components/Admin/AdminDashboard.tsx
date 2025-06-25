@@ -14,7 +14,8 @@ import {
   User,
   FileText,
   Download,
-  RefreshCw
+  RefreshCw,
+  Send
 } from 'lucide-react';
 import { supabase, ForeclosureResponse } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
@@ -156,11 +157,30 @@ export const AdminDashboard: React.FC = () => {
           prev ? { ...prev, status: status as any, notes, assigned_to: user?.id } : null
         );
       }
+
+      // Send status update email notification
+      if (status !== 'submitted') {
+        await sendStatusUpdateNotification(id);
+      }
     } catch (error) {
       console.error('Error updating submission:', error);
       alert('Failed to update submission status');
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const sendStatusUpdateNotification = async (submissionId: string) => {
+    try {
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          submissionId,
+          type: 'status_update'
+        }
+      });
+      console.log('Status update notification sent');
+    } catch (error) {
+      console.error('Failed to send status update notification:', error);
     }
   };
 
@@ -639,9 +659,19 @@ const SubmissionDetails: React.FC<SubmissionDetailsProps> = ({
             <button
               onClick={handleStatusUpdate}
               disabled={isUpdating}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center justify-center"
             >
-              {isUpdating ? 'Updating...' : 'Update Status'}
+              {isUpdating ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  Update Status & Notify
+                </>
+              )}
             </button>
           </div>
         </div>

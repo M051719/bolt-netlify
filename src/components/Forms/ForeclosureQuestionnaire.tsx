@@ -144,12 +144,48 @@ export const ForeclosureQuestionnaire: React.FC = () => {
       }
 
       console.log('Form submitted successfully:', data);
+
+      // Trigger email notifications
+      await triggerEmailNotifications(data);
+
       setIsSubmitted(true);
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const triggerEmailNotifications = async (submission: any) => {
+    try {
+      // Determine urgency level
+      const missedPayments = submission.missed_payments || 0;
+      const hasNOD = submission.nod === 'yes';
+      const isUrgent = hasNOD || missedPayments >= 3;
+
+      // Send new submission notification
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          submissionId: submission.id,
+          type: 'new_submission'
+        }
+      });
+
+      // Send urgent notification if needed
+      if (isUrgent) {
+        await supabase.functions.invoke('send-notification-email', {
+          body: {
+            submissionId: submission.id,
+            type: 'urgent_case'
+          }
+        });
+      }
+
+      console.log('Email notifications triggered successfully');
+    } catch (error) {
+      console.error('Failed to trigger email notifications:', error);
+      // Don't fail the entire submission if email fails
     }
   };
 
@@ -198,6 +234,11 @@ export const ForeclosureQuestionnaire: React.FC = () => {
           <p className="text-gray-600 mb-6">
             Your questionnaire has been submitted successfully. Our team will review your information and contact you within 24 hours with personalized options.
           </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              📧 You'll receive an email confirmation shortly with next steps and our team's contact information.
+            </p>
+          </div>
           <div className="space-y-3">
             <div className="flex items-center justify-center text-sm text-gray-600">
               <Phone className="w-4 h-4 mr-2" />

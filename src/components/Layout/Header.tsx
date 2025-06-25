@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Menu, X, User, LogOut, Settings, CreditCard, Shield } from 'lucide-react';
+import { Building2, Menu, X, User, LogOut, Settings, CreditCard, Shield, FileText } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 
@@ -64,6 +64,16 @@ export const Header: React.FC = () => {
               }`}
             >
               Foreclosure Help
+            </Link>
+            <Link 
+              to="/contracts" 
+              className={`transition-colors ${
+                isActive('/contracts') 
+                  ? 'text-blue-600 font-medium' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`}
+            >
+              Wholesale Contracts
             </Link>
             <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">
               Analysis Tools
@@ -135,6 +145,14 @@ export const Header: React.FC = () => {
                       <User className="w-4 h-4 mr-3" />
                       Profile
                     </a>
+                    <Link
+                      to="/contracts"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <FileText className="w-4 h-4 mr-3" />
+                      Wholesale Contracts
+                    </Link>
                     <a
                       href="#"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -225,6 +243,17 @@ export const Header: React.FC = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Foreclosure Help
+              </Link>
+              <Link 
+                to="/contracts" 
+                className={`block px-4 py-2 rounded-lg ${
+                  isActive('/contracts') 
+                    ? 'bg-blue-50 text-blue-600 font-medium' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Wholesale Contracts
               </Link>
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
                 Analysis Tools

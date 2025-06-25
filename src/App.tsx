@@ -6,6 +6,7 @@ import { Header } from './components/Layout/Header';
 import { PricingPage } from './pages/PricingPage';
 import { AuthPage } from './pages/AuthPage';
 import { ForeclosurePage } from './pages/ForeclosurePage';
+import { ContractsPage } from './pages/ContractsPage';
 import { AdminPage } from './pages/AdminPage';
 import { useAuthStore } from './store/authStore';
 
@@ -21,7 +22,7 @@ const Dashboard: React.FC = () => {
             Your comprehensive real estate analysis platform
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12">
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Property Analysis
@@ -33,10 +34,19 @@ const Dashboard: React.FC = () => {
             
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Market Research
+                Foreclosure Help
               </h3>
               <p className="text-gray-600">
-                Access comprehensive market data and comparables
+                Professional foreclosure assistance and consultation services
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Wholesale Contracts
+              </h3>
+              <p className="text-gray-600">
+                Generate professional wholesale real estate contracts
               </p>
             </div>
             
@@ -75,6 +85,7 @@ function App() {
             />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/foreclosure" element={<ForeclosurePage />} />
+            <Route path="/contracts" element={<ContractsPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

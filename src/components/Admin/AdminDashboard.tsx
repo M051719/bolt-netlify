@@ -28,7 +28,7 @@ import { useAuthStore } from '../../store/authStore';
 import { NotificationSettings } from './NotificationSettings';
 import { ProjectVerification } from './ProjectVerification';
 import { OwnershipVerification } from './OwnershipVerification';
-import { DNSVerification } from './DNSVerification';
+import { SubdomainVerification } from './SubdomainVerification';
 
 interface AdminStats {
   total: number;
@@ -407,7 +407,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Tab Content */}
         {activeTab === 'settings' && <NotificationSettings />}
         {activeTab === 'verification' && <ProjectVerification />}
-        {activeTab === 'dns' && <DNSVerification />}
+        {activeTab === 'dns' && <SubdomainVerification />}
         {activeTab === 'ownership' && <OwnershipVerification />}
         
         {activeTab === 'dashboard' && (

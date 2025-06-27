@@ -21,7 +21,8 @@ import {
   BarChart3,
   Shield,
   Zap,
-  Globe
+  Globe,
+  PhoneCall
 } from 'lucide-react';
 import { supabase, ForeclosureResponse } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
@@ -29,6 +30,7 @@ import { NotificationSettings } from './NotificationSettings';
 import { ProjectVerification } from './ProjectVerification';
 import { OwnershipVerification } from './OwnershipVerification';
 import { SubdomainVerification } from './SubdomainVerification';
+import { CallManagement } from './CallManagement';
 
 interface AdminStats {
   total: number;
@@ -49,7 +51,7 @@ export const AdminDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'verification' | 'ownership' | 'dns'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'calls' | 'settings' | 'verification' | 'ownership' | 'dns'>('dashboard');
   const [stats, setStats] = useState<AdminStats>({
     total: 0,
     submitted: 0,
@@ -358,6 +360,17 @@ export const AdminDashboard: React.FC = () => {
               Dashboard
             </button>
             <button
+              onClick={() => setActiveTab('calls')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'calls'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <PhoneCall className="w-4 h-4 inline mr-2" />
+              AI Calls
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === 'settings'
@@ -405,6 +418,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'calls' && <CallManagement />}
         {activeTab === 'settings' && <NotificationSettings />}
         {activeTab === 'verification' && <ProjectVerification />}
         {activeTab === 'dns' && <SubdomainVerification />}

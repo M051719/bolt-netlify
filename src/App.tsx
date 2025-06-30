@@ -3,11 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Elements } from '@stripe/react-stripe-js';
 import stripePromise from './lib/stripe';
 import { Header } from './components/Layout/Header';
+import { Footer } from './components/Layout/Footer';
 import { PricingPage } from './pages/PricingPage';
 import { AuthPage } from './pages/AuthPage';
 import { ForeclosurePage } from './pages/ForeclosurePage';
 import { ContractsPage } from './pages/ContractsPage';
 import { AdminPage } from './pages/AdminPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { TermsOfServicePage } from './pages/TermsOfServicePage';
 import { useAuthStore } from './store/authStore';
 
 const Dashboard: React.FC = () => {
@@ -71,24 +74,30 @@ function App() {
   return (
     <Elements stripe={stripePromise}>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
           <Header />
           
-          <Routes>
-            <Route 
-              path="/" 
-              element={isAuthenticated ? <Dashboard /> : <Navigate to="/auth" />} 
-            />
-            <Route 
-              path="/auth" 
-              element={!isAuthenticated ? <AuthPage /> : <Navigate to="/" />} 
-            />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/foreclosure" element={<ForeclosurePage />} />
-            <Route path="/contracts" element={<ContractsPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+          <main className="flex-grow">
+            <Routes>
+              <Route 
+                path="/" 
+                element={isAuthenticated ? <Dashboard /> : <Navigate to="/auth" />} 
+              />
+              <Route 
+                path="/auth" 
+                element={!isAuthenticated ? <AuthPage /> : <Navigate to="/" />} 
+              />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/foreclosure" element={<ForeclosurePage />} />
+              <Route path="/contracts" element={<ContractsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </main>
+
+          <Footer />
         </div>
       </Router>
     </Elements>

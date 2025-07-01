@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Complete Nginx SSL Setup Script for repmotivatedseller.org
+# Complete Nginx SSL Setup Script for repmotivatedseller.shoprealestatespace.org
 # Self-contained script that doesn't rely on external dependencies
 
 set -e
 
-echo "🔒 Starting Complete SSL Setup for repmotivatedseller.org"
+echo "🔒 Starting Complete SSL Setup for repmotivatedseller.shoprealestatespace.org"
 
 # Colors for output
 RED='\033[0;31m'
@@ -15,8 +15,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Domain configuration
-DOMAIN="repmotivatedseller.org"
-WWW_DOMAIN="www.repmotivatedseller.org"
+DOMAIN="repmotivatedseller.shoprealestatspace.org"
+WWW_DOMAIN="www.repmotivatedseller.shoprealestatspace.org"
 
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then

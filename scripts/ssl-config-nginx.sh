@@ -89,6 +89,3 @@ else
     echo "Please check your Nginx configuration and try again."
     exit 1
 fi
-EOF
-
-chmod +x scripts/ssl-config-nginx.sh

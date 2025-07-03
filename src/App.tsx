@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Elements } from '@stripe/react-stripe-js';
 import stripePromise from './lib/stripe';
@@ -12,6 +12,7 @@ import { AdminPage } from './pages/AdminPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from './pages/TermsOfServicePage';
 import { useAuthStore } from './store/authStore';
+import { supabase } from './lib/supabase';
 
 const Dashboard: React.FC = () => {
   return (
@@ -69,7 +70,30 @@ const Dashboard: React.FC = () => {
 };
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, login } = useAuthStore();
+
+  // Check for existing session on app load
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const metadata = session.user.user_metadata;
+        
+        login({
+          id: session.user.id,
+          email: session.user.email || '',
+          name: metadata?.name || session.user.email?.split('@')[0] || 'User',
+          membershipTier: metadata?.membershipTier || 'free',
+          stripeCustomerId: metadata?.stripeCustomerId,
+          subscriptionId: metadata?.subscriptionId,
+          subscriptionStatus: metadata?.subscriptionStatus,
+        });
+      }
+    };
+
+    checkSession();
+  }, [login]);
 
   return (
     <Elements stripe={stripePromise}>

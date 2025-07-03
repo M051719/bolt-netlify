@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from '../lib/supabase';
 
 export interface User {
   id: string;
@@ -25,7 +26,12 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       login: (user) => set({ user, isAuthenticated: true }),
-      logout: () => set({ user: null, isAuthenticated: false }),
+      logout: async () => {
+        // Sign out from Supabase
+        await supabase.auth.signOut();
+        // Update local state
+        set({ user: null, isAuthenticated: false });
+      },
       updateMembership: (tier, subscriptionData) =>
         set((state) => ({
           user: state.user
@@ -42,3 +48,22 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    const metadata = session.user.user_metadata;
+    
+    useAuthStore.getState().login({
+      id: session.user.id,
+      email: session.user.email || '',
+      name: metadata?.name || session.user.email?.split('@')[0] || 'User',
+      membershipTier: metadata?.membershipTier || 'free',
+      stripeCustomerId: metadata?.stripeCustomerId,
+      subscriptionId: metadata?.subscriptionId,
+      subscriptionStatus: metadata?.subscriptionStatus,
+    });
+  } else if (event === 'SIGNED_OUT') {
+    useAuthStore.getState().logout();
+  }
+});

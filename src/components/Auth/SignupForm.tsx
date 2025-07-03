@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 
 interface SignupFormProps {
   onToggleMode: () => void;
@@ -15,27 +16,57 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onToggleMode }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const login = useAuthStore((state) => state.login);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      login({
-        id: '1',
+    try {
+      // Sign up with Supabase
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
-        name: formData.name,
-        membershipTier: 'free',
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            membershipTier: 'free',
+          }
+        }
       });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        // Login the user
+        login({
+          id: data.user.id,
+          email: data.user.email || formData.email,
+          name: formData.name,
+          membershipTier: 'free',
+        });
+      }
+    } catch (error: any) {
+      console.error('Error signing up:', error);
+      setError(error.message || 'An error occurred during sign up');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +83,13 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onToggleMode }) => {
           <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
           <p className="text-gray-600 mt-2">Join RepMotivatedSeller today</p>
         </div>
+
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
+            <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

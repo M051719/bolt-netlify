@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 
 interface LoginFormProps {
   onToggleMode: () => void;
@@ -11,22 +12,46 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const login = useAuthStore((state) => state.login);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      login({
-        id: '1',
+    try {
+      // Sign in with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        name: email.split('@')[0],
-        membershipTier: 'free',
+        password,
       });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        // Get user metadata
+        const metadata = data.user.user_metadata;
+        
+        // Login the user
+        login({
+          id: data.user.id,
+          email: data.user.email || email,
+          name: metadata?.name || email.split('@')[0],
+          membershipTier: metadata?.membershipTier || 'free',
+          stripeCustomerId: metadata?.stripeCustomerId,
+          subscriptionId: metadata?.subscriptionId,
+          subscriptionStatus: metadata?.subscriptionStatus,
+        });
+      }
+    } catch (error: any) {
+      console.error('Error signing in:', error);
+      setError(error.message || 'Invalid email or password');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -36,6 +61,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
           <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
+
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
+            <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -77,6 +109,30 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                Remember me
+              </label>
+            </div>
+
+            <div className="text-sm">
+              <button
+                type="button"
+                className="font-medium text-blue-600 hover:text-blue-500"
+                onClick={() => alert('Password reset functionality will be implemented soon!')}
+              >
+                Forgot your password?
               </button>
             </div>
           </div>

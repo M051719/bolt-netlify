@@ -141,13 +141,14 @@ export const Header: React.FC = () => {
                         <p className="text-sm font-medium text-gray-900">{user.name}</p>
                         <p className="text-sm text-gray-600">{user.email}</p>
                       </div>
-                      <a
-                        href="#"
+                      <Link
+                        to="/profile"
                         className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsProfileOpen(false)}
                       >
                         <User className="w-4 h-4 mr-3" />
                         Profile
-                      </a>
+                      </Link>
                       <Link
                         to="/contracts"
                         className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -275,6 +276,19 @@ export const Header: React.FC = () => {
                 >
                   Pricing
                 </Link>
+                {isAuthenticated && (
+                  <Link 
+                    to="/profile" 
+                    className={`block px-4 py-2 rounded-lg ${
+                      isActive('/profile') 
+                        ? 'bg-blue-50 text-blue-600 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                )}
                 {isAdmin && (
                   <Link 
                     to="/admin" 

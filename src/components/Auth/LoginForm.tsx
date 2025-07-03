@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
+import { useAuthStore, fetchUserProfile } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
 interface LoginFormProps {
   onToggleMode: () => void;
+  onForgotPassword?: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode, onForgotPassword }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,19 +33,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
       }
 
       if (data.user) {
-        // Get user metadata
-        const metadata = data.user.user_metadata;
-        
-        // Login the user
-        login({
-          id: data.user.id,
-          email: data.user.email || email,
-          name: metadata?.name || email.split('@')[0],
-          membershipTier: metadata?.membershipTier || 'free',
-          stripeCustomerId: metadata?.stripeCustomerId,
-          subscriptionId: metadata?.subscriptionId,
-          subscriptionStatus: metadata?.subscriptionStatus,
-        });
+        try {
+          // Fetch user profile from profiles table
+          const profile = await fetchUserProfile(data.user.id);
+          
+          if (profile) {
+            // Use profile data
+            login(profile);
+          } else {
+            // Fallback to user metadata if profile doesn't exist yet
+            const metadata = data.user.user_metadata;
+            login({
+              id: data.user.id,
+              email: data.user.email || email,
+              name: metadata?.name || email.split('@')[0],
+              membershipTier: metadata?.membershipTier || 'free',
+              stripeCustomerId: metadata?.stripeCustomerId,
+              subscriptionId: metadata?.subscriptionId,
+              subscriptionStatus: metadata?.subscriptionStatus,
+            });
+          }
+        } catch (profileError) {
+          console.error('Error fetching profile:', profileError);
+          // Fallback to basic user info
+          login({
+            id: data.user.id,
+            email: data.user.email || email,
+            name: email.split('@')[0],
+            membershipTier: 'free',
+          });
+        }
       }
     } catch (error: any) {
       console.error('Error signing in:', error);
@@ -130,7 +148,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
               <button
                 type="button"
                 className="font-medium text-blue-600 hover:text-blue-500"
-                onClick={() => alert('Password reset functionality will be implemented soon!')}
+                onClick={onForgotPassword}
               >
                 Forgot your password?
               </button>

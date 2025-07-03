@@ -51,3 +51,17 @@ export interface ForeclosureResponse {
   created_at: string
   updated_at: string
 }
+
+export interface Profile {
+  id: string
+  user_id: string
+  name: string
+  email: string
+  membership_tier: 'free' | 'pro' | 'enterprise'
+  stripe_customer_id?: string
+  subscription_id?: string
+  subscription_status?: 'active' | 'canceled' | 'past_due' | 'incomplete'
+  last_sign_in?: string
+  created_at: string
+  updated_at: string
+}

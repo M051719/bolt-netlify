@@ -14,6 +14,7 @@ export const AuthPage: React.FC = () => {
         {authMode === 'login' && (
           <LoginForm 
             onToggleMode={() => setAuthMode('signup')} 
+            onForgotPassword={() => setAuthMode('reset-password')}
           />
         )}
         
@@ -27,17 +28,6 @@ export const AuthPage: React.FC = () => {
           <ResetPasswordForm 
             onBack={() => setAuthMode('login')} 
           />
-        )}
-        
-        {authMode === 'login' && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => setAuthMode('reset-password')}
-              className="text-sm text-blue-600 hover:text-blue-700"
-            >
-              Forgot your password?
-            </button>
-          </div>
         )}
       </div>
     </div>

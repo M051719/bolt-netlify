@@ -11,7 +11,8 @@ import { ContractsPage } from './pages/ContractsPage';
 import { AdminPage } from './pages/AdminPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from './pages/TermsOfServicePage';
-import { useAuthStore } from './store/authStore';
+import { ProfilePage } from './pages/ProfilePage';
+import { useAuthStore, fetchUserProfile } from './store/authStore';
 import { supabase } from './lib/supabase';
 
 const Dashboard: React.FC = () => {
@@ -78,17 +79,36 @@ function App() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        const metadata = session.user.user_metadata;
-        
-        login({
-          id: session.user.id,
-          email: session.user.email || '',
-          name: metadata?.name || session.user.email?.split('@')[0] || 'User',
-          membershipTier: metadata?.membershipTier || 'free',
-          stripeCustomerId: metadata?.stripeCustomerId,
-          subscriptionId: metadata?.subscriptionId,
-          subscriptionStatus: metadata?.subscriptionStatus,
-        });
+        try {
+          // Fetch user profile from profiles table
+          const profile = await fetchUserProfile(session.user.id);
+          
+          if (profile) {
+            // Use profile data
+            login(profile);
+          } else {
+            // Fallback to user metadata if profile doesn't exist yet
+            const metadata = session.user.user_metadata;
+            login({
+              id: session.user.id,
+              email: session.user.email || '',
+              name: metadata?.name || session.user.email?.split('@')[0] || 'User',
+              membershipTier: metadata?.membershipTier || 'free',
+              stripeCustomerId: metadata?.stripeCustomerId,
+              subscriptionId: metadata?.subscriptionId,
+              subscriptionStatus: metadata?.subscriptionStatus,
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+          // Fallback to basic user info
+          login({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.email?.split('@')[0] || 'User',
+            membershipTier: 'free',
+          });
+        }
       }
     };
 
@@ -115,6 +135,7 @@ function App() {
               <Route path="/foreclosure" element={<ForeclosurePage />} />
               <Route path="/contracts" element={<ContractsPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate to="/auth" />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-of-service" element={<TermsOfServicePage />} />
               <Route path="*" element={<Navigate to="/" />} />

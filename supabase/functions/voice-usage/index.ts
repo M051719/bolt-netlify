@@ -1,36 +1,27 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// Define CORS headers for browser requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+}
 
 interface VoiceUsageRequest {
-  text_length: number;
+  text: string;
   voice: string;
   model: string;
-  tier?: string;
+  tier: 'free' | 'pro' | 'enterprise';
 }
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders, status: 204 });
-  }
-
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
-      { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Create Supabase client with auth context from request
+    // Create Supabase client with user's JWT
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -39,92 +30,72 @@ serve(async (req) => {
           headers: { Authorization: req.headers.get('Authorization')! },
         },
       }
-    );
+    )
 
     // Get the current user
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser()
 
     if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
+      throw new Error('User not authenticated')
     }
 
-    // Parse request body
-    const { text_length, voice, model, tier = 'free' }: VoiceUsageRequest = await req.json();
+    // Parse the request body
+    const { text, voice, model, tier }: VoiceUsageRequest = await req.json()
 
-    // Validate required fields
-    if (!text_length || !voice || !model) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields: text_length, voice, model' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
+    // Validate input
+    if (!text || !voice || !model || !tier) {
+      throw new Error('Missing required fields')
     }
 
-    // Validate tier value
-    if (!['free', 'pro', 'enterprise'].includes(tier)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid tier value. Must be one of: free, pro, enterprise' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-    }
+    // Calculate text length
+    const textLength = text.length
 
-    // Log voice usage to database
-    const { data, error: insertError } = await supabaseClient
+    // Log usage to database
+    const { data, error } = await supabaseClient
       .from('voice_usage')
       .insert([
         {
           user_id: user.id,
-          text_length,
+          text_length: textLength,
           voice,
           model,
           tier
         }
-      ]);
+      ])
+      .select()
+      .single()
 
-    if (insertError) {
-      console.error('Error logging voice usage:', insertError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to log voice usage', details: insertError.message }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
+    if (error) {
+      throw error
     }
 
-    // Get user's current usage statistics
-    const { data: usageStats, error: usageError } = await supabaseClient
-      .from('voice_usage')
-      .select('text_length')
-      .eq('user_id', user.id)
-      .gte('created_at', new Date(new Date().setDate(new Date().getDate() - 30)).toISOString());
-
-    if (usageError) {
-      console.error('Error fetching usage statistics:', usageError);
-    }
-
-    // Calculate total usage in the last 30 days
-    const totalUsage = usageStats?.reduce((sum, record) => sum + record.text_length, 0) || 0;
-
+    // Return success response
     return new Response(
       JSON.stringify({
         success: true,
         message: 'Voice usage logged successfully',
-        usage: {
-          current: text_length,
-          total_30_days: totalUsage,
-          tier
-        }
+        usage: data
       }),
-      { headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
   } catch (error) {
-    console.error('Error processing voice usage request:', error);
+    console.error('Error logging voice usage:', error)
+    
     return new Response(
-      JSON.stringify({ error: 'Failed to process request', details: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
+      JSON.stringify({
+        success: false,
+        error: error.message || 'An unexpected error occurred',
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    )
   }
-});
+})

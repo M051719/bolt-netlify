@@ -1,9 +1,37 @@
 #!/bin/bash
 
-# Complete Nginx SSL Setup Script for repmotivatedseller.shoprealestatespace.org
-# Self-contained script that doesn't rely on external dependencies
+# Nginx SSL Setup Script for repmotivatedseller.shoprealestatespace.org
+# NOTE: This script requires a full Linux server environment with root access
+# It cannot run in WebContainer or similar browser-based environments
 
 set -e
+
+# Check if we're in a supported environment
+if [ ! -d "/etc" ] || [ ! -w "/etc" ]; then
+    echo "❌ Error: This script requires a full Linux server environment with root access."
+    echo "🌐 WebContainer and browser-based environments are not supported."
+    echo ""
+    echo "📋 To use this script:"
+    echo "1. Deploy to a VPS or dedicated server (Ubuntu/Debian recommended)"
+    echo "2. SSH into your server as root or a user with sudo privileges"
+    echo "3. Run: bash scripts/install-nginx-ssl.sh"
+    echo ""
+    echo "🔗 For WebContainer deployment, use services like:"
+    echo "   - Netlify (for static sites)"
+    echo "   - Vercel (for Next.js/React apps)"
+    echo "   - Railway (for full-stack apps)"
+    exit 1
+fi
+
+# Check if running as root or if sudo is available
+if [ "$EUID" -ne 0 ] && ! command -v sudo &> /dev/null; then
+    echo "❌ Error: This script must be run as root or sudo must be available."
+    echo "💡 Try one of these options:"
+    echo "   - Run as root: su - then bash scripts/install-nginx-ssl.sh"
+    echo "   - Install sudo: apt update && apt install sudo"
+    echo "   - Use a different user with sudo privileges"
+    exit 1
+fi
 
 echo "🔒 Starting Complete SSL Setup for repmotivatedseller.shoprealestatespace.org"
 
@@ -18,41 +46,51 @@ NC='\033[0m' # No Color
 DOMAIN="repmotivatedseller.shoprealestatespace.org"
 WWW_DOMAIN="www.repmotivatedseller.shoprealestatespace.org"
 
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then
-   echo -e "${RED}This script must be run as root (use sudo)${NC}"
-   exit 1
+# Function to run commands with or without sudo
+run_cmd() {
+    if [ "$EUID" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+# Verify we can run administrative commands
+if ! run_cmd echo "Testing administrative access..." > /dev/null 2>&1; then
+    echo -e "${RED}❌ Cannot execute administrative commands${NC}"
+    echo -e "${YELLOW}Please ensure you have root access or sudo privileges${NC}"
+    exit 1
 fi
 
 echo -e "${BLUE}📦 Step 1: Installing Nginx...${NC}"
 
 # Update package list
-apt update
+run_cmd apt update
 
 # Install Nginx and required packages
-apt install -y nginx openssl curl
+run_cmd apt install -y nginx openssl curl
 
 # Start and enable Nginx
-systemctl start nginx
-systemctl enable nginx
+run_cmd systemctl start nginx
+run_cmd systemctl enable nginx
 
 echo -e "${GREEN}✅ Nginx installed successfully${NC}"
 
 echo -e "${BLUE}🔑 Step 2: Creating SSL certificates...${NC}"
 
 # Create SSL directory
-mkdir -p /etc/nginx/ssl
-mkdir -p /etc/nginx/conf.d
+run_cmd mkdir -p /etc/nginx/ssl
+run_cmd mkdir -p /etc/nginx/conf.d
 
 # Generate strong DH parameters (this may take a few minutes)
 echo -e "${YELLOW}⏳ Generating DH parameters (this may take 2-5 minutes)...${NC}"
-openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
+run_cmd openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
 
 # Create self-signed certificate for initial setup
 # In production, you should use Cloudflare Origin CA or Let's Encrypt
 echo -e "${YELLOW}📜 Creating self-signed SSL certificate...${NC}"
 
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+run_cmd openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/nginx/ssl/${DOMAIN}.key \
     -out /etc/nginx/ssl/${DOMAIN}.crt \
     -subj "/C=US/ST=State/L=City/O=RepMotivatedSeller/OU=IT/CN=${DOMAIN}/emailAddress=admin@${DOMAIN}" \
@@ -86,16 +124,16 @@ EOF
 )
 
 # Set proper permissions
-chmod 600 /etc/nginx/ssl/${DOMAIN}.key
-chmod 644 /etc/nginx/ssl/${DOMAIN}.crt
-chmod 644 /etc/nginx/ssl/dhparam.pem
+run_cmd chmod 600 /etc/nginx/ssl/${DOMAIN}.key
+run_cmd chmod 644 /etc/nginx/ssl/${DOMAIN}.crt
+run_cmd chmod 644 /etc/nginx/ssl/dhparam.pem
 
 echo -e "${GREEN}✅ SSL certificates created${NC}"
 
 echo -e "${BLUE}⚙️ Step 3: Configuring Nginx with modern SSL settings...${NC}"
 
 # Create modern SSL configuration
-cat > /etc/nginx/conf.d/ssl-modern.conf << 'EOF'
+run_cmd tee /etc/nginx/conf.d/ssl-modern.conf > /dev/null << 'EOF'
 # Modern SSL/TLS Configuration for Cloudflare Compatibility
 # Optimized for RepMotivatedSeller
 
@@ -136,7 +174,7 @@ ssl_early_data on;
 EOF
 
 # Create site configuration for repmotivatedseller.org
-cat > /etc/nginx/sites-available/${DOMAIN} << EOF
+run_cmd tee /etc/nginx/sites-available/${DOMAIN} > /dev/null << EOF
 # RepMotivatedSeller.org - Production Configuration
 # Optimized for Cloudflare and modern SSL/TLS
 
@@ -281,21 +319,21 @@ server {
 EOF
 
 # Enable the site
-ln -sf /etc/nginx/sites-available/${DOMAIN} /etc/nginx/sites-enabled/
+run_cmd ln -sf /etc/nginx/sites-available/${DOMAIN} /etc/nginx/sites-enabled/
 
 # Remove default site if it exists
-rm -f /etc/nginx/sites-enabled/default
+run_cmd rm -f /etc/nginx/sites-enabled/default
 
 echo -e "${GREEN}✅ Nginx configuration created${NC}"
 
 echo -e "${BLUE}🧪 Step 4: Testing configuration...${NC}"
 
 # Test Nginx configuration
-if nginx -t; then
+if run_cmd nginx -t; then
     echo -e "${GREEN}✅ Nginx configuration test passed${NC}"
     
     # Reload Nginx
-    systemctl reload nginx
+    run_cmd systemctl reload nginx
     echo -e "${GREEN}✅ Nginx reloaded successfully${NC}"
 else
     echo -e "${RED}❌ Nginx configuration test failed${NC}"
@@ -307,8 +345,8 @@ echo -e "${BLUE}🔥 Step 5: Setting up firewall...${NC}"
 
 # Configure UFW firewall
 if command -v ufw &> /dev/null; then
-    ufw allow 'Nginx Full'
-    ufw allow ssh
+    run_cmd ufw allow 'Nginx Full'
+    run_cmd ufw allow ssh
     echo -e "${GREEN}✅ Firewall configured${NC}"
 else
     echo -e "${YELLOW}⚠️ UFW not installed, skipping firewall configuration${NC}"
@@ -317,8 +355,8 @@ fi
 echo -e "${BLUE}📄 Step 6: Creating sample index page...${NC}"
 
 # Create a sample index page
-mkdir -p /var/www/html
-cat > /var/www/html/index.html << EOF
+run_cmd mkdir -p /var/www/html
+run_cmd tee /var/www/html/index.html > /dev/null << EOF
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -409,8 +447,8 @@ cat > /var/www/html/index.html << EOF
 EOF
 
 # Set proper permissions
-chown -R www-data:www-data /var/www/html
-chmod -R 755 /var/www/html
+run_cmd chown -R www-data:www-data /var/www/html
+run_cmd chmod -R 755 /var/www/html
 
 echo -e "${GREEN}✅ Sample page created${NC}"
 

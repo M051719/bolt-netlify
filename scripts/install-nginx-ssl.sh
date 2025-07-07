@@ -19,7 +19,7 @@ DOMAIN="repmotivatedseller.shoprealestatespace.org"
 WWW_DOMAIN="www.repmotivatedseller.shoprealestatespace.org"
 
 # Check if running as root
-if [[ $EUID -ne 0 ]]; then
+if [ "$EUID" -ne 0 ]; then
    echo -e "${RED}This script must be run as root (use sudo)${NC}"
    exit 1
 fi

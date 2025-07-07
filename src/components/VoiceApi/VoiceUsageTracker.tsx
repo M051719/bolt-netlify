@@ -27,9 +27,11 @@ export const VoiceUsageTracker: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');
   const { user } = useAuthStore();
+  const [usageLimits, setUsageLimits] = useState<any>(null);
 
   useEffect(() => {
     fetchUsageData();
+    fetchUsageLimits();
   }, [timeframe]);
 
   const fetchUsageData = async () => {
@@ -61,6 +63,22 @@ export const VoiceUsageTracker: React.FC = () => {
       console.error('Error fetching voice usage data:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUsageLimits = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-api-limits', {
+        body: {
+          apiType: 'voice',
+          requestSize: 0
+        }
+      });
+      
+      if (error) throw error;
+      setUsageLimits(data);
+    } catch (error) {
+      console.error('Error fetching usage limits:', error);
     }
   };
 
@@ -260,6 +278,97 @@ export const VoiceUsageTracker: React.FC = () => {
         </div>
       )}
 
+      {/* Usage Limits */}
+      {usageLimits && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <Shield className="w-5 h-5 mr-2 text-blue-600" />
+            Usage Limits ({user?.membershipTier} tier)
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium text-gray-700">Daily Usage</span>
+                  <span className="text-gray-600">
+                    {usageLimits.currentUsage.daily.toLocaleString()} / {usageLimits.limits.daily.toLocaleString()} chars
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className={`h-2.5 rounded-full ${
+                      usageLimits.currentUsage.daily / usageLimits.limits.daily > 0.9 
+                        ? 'bg-red-600' 
+                        : usageLimits.currentUsage.daily / usageLimits.limits.daily > 0.7
+                        ? 'bg-yellow-600'
+                        : 'bg-green-600'
+                    }`}
+                    style={{ width: `${Math.min(100, (usageLimits.currentUsage.daily / usageLimits.limits.daily) * 100)}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {usageLimits.remaining.daily.toLocaleString()} characters remaining today
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium text-gray-700">Monthly Usage</span>
+                  <span className="text-gray-600">
+                    {usageLimits.currentUsage.monthly.toLocaleString()} / {usageLimits.limits.monthly.toLocaleString()} chars
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className={`h-2.5 rounded-full ${
+                      usageLimits.currentUsage.monthly / usageLimits.limits.monthly > 0.9 
+                        ? 'bg-red-600' 
+                        : usageLimits.currentUsage.monthly / usageLimits.limits.monthly > 0.7
+                        ? 'bg-yellow-600'
+                        : 'bg-green-600'
+                    }`}
+                    style={{ width: `${Math.min(100, (usageLimits.currentUsage.monthly / usageLimits.limits.monthly) * 100)}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {usageLimits.remaining.monthly.toLocaleString()} characters remaining this month
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-3">Tier Limits</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Max Request Size:</span>
+                  <span className="font-medium">{usageLimits.limits.maxRequestSize.toLocaleString()} chars</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Daily Limit:</span>
+                  <span className="font-medium">{usageLimits.limits.daily.toLocaleString()} chars</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Monthly Limit:</span>
+                  <span className="font-medium">{usageLimits.limits.monthly.toLocaleString()} chars</span>
+                </div>
+                {user?.membershipTier === 'free' && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <a 
+                      href="/pricing" 
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center"
+                    >
+                      <Zap className="w-4 h-4 mr-1" />
+                      Upgrade for higher limits
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="border-t border-gray-200 pt-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Usage</h3>
         
@@ -316,7 +425,7 @@ export const VoiceUsageTracker: React.FC = () => {
       {user?.membershipTier === 'free' && (
         <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-start">
-            <Clock className="w-5 h-5 text-yellow-600 mr-3 mt-0.5" />
+            <Clock className="w-5 h-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="font-medium text-yellow-900">Free Tier Limitations</h4>
               <p className="text-yellow-800 text-sm mt-1">

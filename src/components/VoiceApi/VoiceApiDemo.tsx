@@ -36,6 +36,8 @@ export const VoiceApiDemo: React.FC = () => {
   const [model, setModel] = useState<'standard' | 'hd'>('standard');
   const [speed, setSpeed] = useState<number>(1.0);
   const [usageLogged, setUsageLogged] = useState(false);
+  const [usageLimits, setUsageLimits] = useState<any>(null);
+  const [isCheckingLimits, setIsCheckingLimits] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const { user } = useAuthStore();
@@ -76,11 +78,43 @@ export const VoiceApiDemo: React.FC = () => {
     }
   };
 
+  const checkApiLimits = async () => {
+    if (!text.trim()) return;
+    
+    setIsCheckingLimits(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('check-api-limits', {
+        body: {
+          apiType: 'voice',
+          requestSize: text.length
+        }
+      });
+      
+      if (error) throw error;
+      setUsageLimits(data);
+      
+      if (!data.allowed) {
+        setError(data.message || 'Usage limit exceeded');
+      }
+      
+      return data.allowed;
+    } catch (err) {
+      console.error('Error checking API limits:', err);
+      return true; // Allow by default if check fails
+    } finally {
+      setIsCheckingLimits(false);
+    }
+  };
+
   const generateSpeech = async () => {
     if (!text.trim()) {
       setError('Please enter some text to convert to speech');
       return;
     }
+
+    // Check API limits first
+    const limitsOk = await checkApiLimits();
+    if (!limitsOk) return;
 
     setIsLoading(true);
     setError(null);
@@ -389,7 +423,7 @@ export const VoiceApiDemo: React.FC = () => {
       {user?.membershipTier === 'free' && (
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-start">
-            <Volume2 className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+            <Clock className="w-5 h-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="font-medium text-blue-900">Upgrade for Premium Voices</h4>
               <p className="text-blue-800 text-sm mt-1">
@@ -401,6 +435,67 @@ export const VoiceApiDemo: React.FC = () => {
               >
                 View Pricing Plans →
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {usageLimits && (
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-medium text-blue-900 mb-2">Usage Statistics</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <div className="text-blue-700 font-medium">Daily Usage</div>
+              <div className="flex justify-between mt-1">
+                <span>Used:</span>
+                <span>{usageLimits.currentUsage.daily.toLocaleString()} chars</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Limit:</span>
+                <span>{usageLimits.limits.daily.toLocaleString()} chars</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full" 
+                  style={{ width: `${Math.min(100, (usageLimits.currentUsage.daily / usageLimits.limits.daily) * 100)}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-blue-700 font-medium">Monthly Usage</div>
+              <div className="flex justify-between mt-1">
+                <span>Used:</span>
+                <span>{usageLimits.currentUsage.monthly.toLocaleString()} chars</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Limit:</span>
+                <span>{usageLimits.limits.monthly.toLocaleString()} chars</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full" 
+                  style={{ width: `${Math.min(100, (usageLimits.currentUsage.monthly / usageLimits.limits.monthly) * 100)}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-blue-700 font-medium">Request Size</div>
+              <div className="flex justify-between mt-1">
+                <span>Current:</span>
+                <span>{text.length.toLocaleString()} chars</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Max:</span>
+                <span>{usageLimits.limits.maxRequestSize.toLocaleString()} chars</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div 
+                  className={`h-2 rounded-full ${text.length > usageLimits.limits.maxRequestSize ? 'bg-red-600' : 'bg-blue-600'}`}
+                  style={{ width: `${Math.min(100, (text.length / usageLimits.limits.maxRequestSize) * 100)}%` }}
+                ></div>
+              </div>
             </div>
           </div>
         </div>

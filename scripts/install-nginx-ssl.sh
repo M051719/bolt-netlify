@@ -15,8 +15,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Domain configuration
-DOMAIN="repmotivatedseller.shoprealestatspace.org"
-WWW_DOMAIN="www.repmotivatedseller.shoprealestatspace.org"
+DOMAIN="repmotivatedseller.shoprealestatespace.org"
+WWW_DOMAIN="www.repmotivatedseller.shoprealestatespace.org"
 
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then

@@ -20,9 +20,6 @@ serve(async (req) => {
 
     // Get submissions that need follow-up reminders
     const now = new Date()
-    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-    const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
 
     // Find submissions that need reminders
@@ -30,7 +27,8 @@ serve(async (req) => {
       .from('foreclosure_responses')
       .select('*')
       .in('status', ['submitted', 'reviewed'])
-      .or(`created_at.eq.${oneDayAgo.toISOString().split('T')[0]},created_at.eq.${threeDaysAgo.toISOString().split('T')[0]},created_at.eq.${sevenDaysAgo.toISOString().split('T')[0]},created_at.eq.${fourteenDaysAgo.toISOString().split('T')[0]}`)
+      .gte('created_at', fourteenDaysAgo.toISOString())
+      .lte('created_at', now.toISOString())
 
     if (error) throw error
 

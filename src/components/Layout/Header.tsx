@@ -3,6 +3,7 @@ import { Building2, Menu, X, User, LogOut, Settings, CreditCard, Shield, FileTex
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { FinancingBanner } from './FinancingBanner';
+import { isAdminEmail } from '../../utils/accessControl';
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,9 +29,7 @@ export const Header: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Check if user is admin
-  const isAdmin = user?.email === 'admin@repmotivatedseller.org' || 
-                  user?.name?.toLowerCase().includes('admin');
+  const isAdmin = isAdminEmail(user?.email);
 
   return (
     <>

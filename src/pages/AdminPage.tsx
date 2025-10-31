@@ -2,13 +2,13 @@ import React from 'react';
 import { AdminDashboard } from '../components/Admin/AdminDashboard';
 import { useAuthStore } from '../store/authStore';
 import { Shield, AlertTriangle } from 'lucide-react';
+import { isAdminEmail } from '../utils/accessControl';
 
 export const AdminPage: React.FC = () => {
   const { user, isAuthenticated } = useAuthStore();
 
   // Check if user is admin (you can modify this logic based on your admin setup)
-  const isAdmin = user?.email === 'admin@repmotivatedseller.org' || 
-                  user?.name?.toLowerCase().includes('admin');
+  const isAdmin = isAdminEmail(user?.email);
 
   if (!isAuthenticated) {
     return (

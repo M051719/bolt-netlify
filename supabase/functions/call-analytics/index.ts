@@ -19,20 +19,40 @@ serve(async (req) => {
     )
 
     const url = new URL(req.url)
-    const action = url.searchParams.get('action') || 'dashboard'
+    let requestData: Record<string, any> | null = null
+
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      const contentType = req.headers.get('content-type') || ''
+
+      if (contentType.includes('application/json')) {
+        try {
+          requestData = await req.json()
+        } catch (jsonError) {
+          console.error('Invalid JSON payload received:', jsonError)
+          return new Response(JSON.stringify({ error: 'Invalid JSON payload' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+      }
+    }
+
+    const action = (requestData?.action as string | undefined) 
+      ?? url.searchParams.get('action') 
+      ?? 'dashboard'
 
     switch (action) {
       case 'dashboard':
         return await getCallAnalyticsDashboard(supabaseClient)
       case 'call-details':
-        const callId = url.searchParams.get('callId')
+        const callId = (requestData?.callId as string | undefined) ?? url.searchParams.get('callId')
         return await getCallDetails(supabaseClient, callId)
       case 'intent-analysis':
         return await getIntentAnalysis(supabaseClient)
       case 'agent-performance':
         return await getAgentPerformance(supabaseClient)
       default:
-        return new Response(JSON.stringify({ error: 'Invalid action' }), {
+        return new Response(JSON.stringify({ error: `Invalid action: ${action}` }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
@@ -50,7 +70,8 @@ async function getCallAnalyticsDashboard(supabaseClient: any) {
   // Get call statistics
   const { data: callStats } = await supabaseClient
     .from('ai_calls')
-    .select('call_status, priority_level, created_at, call_duration')
+    .select('id, phone_number, call_status, priority_level, created_at, call_duration, primary_intent, requires_human_followup, caller_name, ai_confidence_score, call_summary')
+    .order('created_at', { ascending: false })
 
   // Get intent distribution
   const { data: intentStats } = await supabaseClient
@@ -69,7 +90,7 @@ async function getCallAnalyticsDashboard(supabaseClient: any) {
   const avgDuration = callStats?.reduce((sum, call) => sum + (call.call_duration || 0), 0) / totalCalls || 0
 
   const today = new Date().toISOString().split('T')[0]
-  const todayCalls = callStats?.filter(call => call.created_at.startsWith(today)).length || 0
+  const todayCalls = callStats?.filter(call => call.created_at && call.created_at.startsWith(today)).length || 0
 
   const urgentCalls = callStats?.filter(call => call.priority_level === 'urgent').length || 0
   const highPriorityCalls = callStats?.filter(call => call.priority_level === 'high').length || 0
